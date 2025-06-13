@@ -49,4 +49,4 @@
 
 ---
 
-💡 <p align="center"><i>"If I have seen further, it is by standing on the shoulders of giants."</i><br>– <i>Isaac Newton</i></p>
+<p align="center"><i>"If I have seen further, it is by standing on the shoulders of giants."</i><br>– <i>Isaac Newton</i></p>
