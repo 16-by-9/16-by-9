@@ -45,7 +45,7 @@
 ### 📫 Contact Me
 
 📩 **Email:** [abupdown8@gmail.com]    
-[![Discord](https://img.shields.io/badge/Discord-%237289DA?style=flat&logo=discord&logoColor=white)](https://discord.com/users/yourdiscordid)
+[![Discord](https://img.shields.io/badge/Discord-%237289DA?style=flat&logo=discord&logoColor=white)](https://discord.com/users/940337616430194820)
 
 ---
 
