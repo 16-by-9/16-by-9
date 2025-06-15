@@ -42,6 +42,14 @@
 
 ---
 
+## 📊 My Project Languages
+
+<!--LANGUAGE_STATS_START-->
+Updating...
+<!--LANGUAGE_STATS_END-->
+
+---
+
 ### 📫 Contact Me
 
 📩 **Email:** [abupdown8@gmail.com]    
