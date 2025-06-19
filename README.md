@@ -45,7 +45,9 @@
 ## 📊 My Project Languages
 
 <!--LANGUAGE_STATS_START-->
+16 C++ projects
 9 Python projects
+2 JSON projects
 <!--LANGUAGE_STATS_END-->
 
 ---
