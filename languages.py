@@ -78,7 +78,9 @@ def update_readme(counts):
         content = f.read()
     before = content.split(start_tag)[0]
     after = content.split(end_tag)[1]
-    stats = "\n".join([f"{count} {lang} project{'s' if count > 1 else ''}" for lang, count in sorted(counts.items(), key=lambda x: -x[1])])
+    stats = "\n".join(
+    [f"- {count} {lang} project{'s' if count > 1 else ''}" for lang, count in sorted(counts.items(), key=lambda x: -x[1])]
+)
     new_block = f"{start_tag}\n{stats}\n{end_tag}"
     with open("README.md", "w", encoding="utf-8") as f:
         f.write(before + new_block + after)
