@@ -22,7 +22,7 @@
 
 
 ### **Hardware & Electronics:**
-[![Arduino](https://img.shields.io/badge/-Arduino-00979D?style=flat&logo=arduino&logoColor=white)](https://www.arduino.cc/)
+<a href="https://www.arduino.cc/" target="_blank"><img src="https://img.shields.io/badge/-Arduino-00979D?style=flat&logo=arduino&logoColor=white" alt="Arduino"></a>
 [![Raspberry Pi](https://img.shields.io/badge/-Raspberry%20Pi-A22846?style=flat&logo=raspberry-pi&logoColor=white)](https://www.raspberrypi.org/)
 [![ESP32](https://img.shields.io/badge/-ESP32-000000?style=flat&logo=esphome&logoColor=white)](https://www.espressif.com)
 
