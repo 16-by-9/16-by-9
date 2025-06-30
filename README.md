@@ -45,10 +45,10 @@
 ## 📊 My Project Languages
 
 <!--LANGUAGE_STATS_START-->
-- 17 C++ projects
+- 18 C++ projects
 - 9 Python projects
+- 2 C projects
 - 2 JSON projects
-- 1 C project
 <!--LANGUAGE_STATS_END-->
 
 ---
