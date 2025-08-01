@@ -14,7 +14,6 @@ LANGUAGES_EXT = {
     "C#": [".cs"],
     "Java": [".java", ".jar"],
     "JavaScript": [".js"],
-    "JSON": [".json"],
     "TypeScript": [".ts"],
     "Go": [".go"],
     "Rust": [".rs"],
