@@ -50,7 +50,6 @@
 - 18 C++ projects
 - 9 Python projects
 - 2 C projects
-- 2 JSON projects
 <!--LANGUAGE_STATS_END-->
 
 ---
