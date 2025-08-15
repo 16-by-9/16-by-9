@@ -48,7 +48,7 @@
 
 <!--LANGUAGE_STATS_START-->
 - 18 C++ projects
-- 9 Python projects
+- 14 Python projects
 - 2 C projects
 <!--LANGUAGE_STATS_END-->
 
