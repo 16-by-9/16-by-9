@@ -7,7 +7,7 @@
 ### 🚀 About Me
 
 -   Aspiring in mechatronics with a strong foundation in **Arduino/ESP32 and Raspberry Pi**.
--   Skilled in **Arduino**, **ESP32**, with a focus on **ML/AI and Raspberry Pi development**. 
+-   Skilled in **Arduino**, **ESP32**, with a focus on **ML/AI and Raspberry Pi development** as well as **PCB designing and 3D designing**. 
 -   Passionate about building projects that combine **hardware and software** to solve practical problems.    
 -   Focused on making mechatronics education more **accessible** and **fun**, especially in Lebanon.   
 
