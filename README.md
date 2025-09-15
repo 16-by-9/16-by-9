@@ -20,7 +20,6 @@
 [![C++](https://img.shields.io/badge/-C++-00599C?style=flat&logo=c%2B%2B&logoColor=white)](https://isocpp.org/)
 [![C#](https://img.shields.io/badge/C%23-239120?style=flat&logo=c-sharp&logoColor=white)](https://learn.microsoft.com/en-us/dotnet/csharp/)
 [![Python](https://img.shields.io/badge/-Python-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)
-[![JavaScript](https://img.shields.io/badge/-JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 
 
 ### **Hardware & Electronics:**
@@ -31,16 +30,14 @@
 
 ### **Software & Tools:**
 [![VS Code](https://img.shields.io/badge/-VS%20Code-007ACC?style=flat&logo=visual-studio-code&logoColor=white)](https://code.visualstudio.com/)
-[![KiCad](https://img.shields.io/badge/-KiCad-2C3E50?style=flat&logo=kicad&logoColor=white)](https://www.kicad.org/)
 [![Thonny](https://img.shields.io/badge/Thonny-5F4BB6?style=flat&logo=thonny&logoColor=white)](https://thonny.org/)
 [![CLion](https://img.shields.io/badge/CLion-000000?style=flat&logo=clion&logoColor=white)](https://www.jetbrains.com/clion/)
 [![Rider](https://img.shields.io/badge/Rider-000000?style=flat&logo=rider&logoColor=white)](https://www.jetbrains.com/rider/)
 
 ### **Design & Electronics:**
 [![Altium Designer](https://img.shields.io/badge/Altium%20Designer-00979D?style=for-the-badge&logo=altiumdesigner&logoColor=white)](https://www.altium.com)
-[![EasyEDA](https://img.shields.io/badge/EasyEDA-0A192F?style=for-the-badge&logo=easyeda&logoColor=white)](https://easyeda.com)
-[![Eagle](https://img.shields.io/badge/Eagle-FF6600?style=for-the-badge&logo=autodesk&logoColor=white)](https://www.autodesk.com/products/eagle/overview)
-[![Fusion 360](https://img.shields.io/badge/Fusion%20360-FA7100?style=for-the-badge&logo=autodesk&logoColor=white)](https://www.autodesk.com/products/fusion-360)
+[![SolidWorks](https://img.shields.io/badge/SolidWorks-CC0000?style=for-the-badge&logo=dassaultsystemes&logoColor=white)](https://www.solidworks.com)
+
 
 ---
 
