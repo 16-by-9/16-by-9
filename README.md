@@ -31,7 +31,7 @@
 ### **Software & Tools:**
 [![VS Code](https://img.shields.io/badge/-VS%20Code-007ACC?style=flat&logo=visual-studio-code&logoColor=white)](https://code.visualstudio.com/)
 [![Thonny](https://img.shields.io/badge/Thonny-5F4BB6?style=flat&logo=thonny&logoColor=white)](https://thonny.org/)
-[![CLion](https://img.shields.io/badge/CLion-000000?style=flat&logo=clion&logoColor=white)](https://www.jetbrains.com/clion/)
+[![Embarcadero Dev-C++](https://img.shields.io/badge/Embarcadero%20Dev--C%2B%2B-000000?style=flat&logo=c%2B%2B&logoColor=white)](https://www.embarcadero.com/products/dev-cpp)
 [![Rider](https://img.shields.io/badge/Rider-000000?style=flat&logo=rider&logoColor=white)](https://www.jetbrains.com/rider/)
 
 ### **Design & Electronics:**
