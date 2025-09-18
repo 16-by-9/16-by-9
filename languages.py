@@ -24,6 +24,7 @@ LANGUAGES_EXT = {
     "Assembly": [".s", ".asm"],
     "PHP": [".php"],
     "Kotlin": [".kt", ".kts"],
+    "SolidWorks": [".STL", ".stl", ".3MF", ".3mf", ".SLDPRT"],
     "Swift": [".swift"],
     "Ruby": [".rb"],
     "R": [".r"],
@@ -88,3 +89,4 @@ if __name__ == "__main__":
     repos = get_user_repos()
     counts = get_language_counts(repos)
     update_readme(counts)
+
