@@ -31,6 +31,46 @@ LANGUAGES_EXT = {
     "Dart": [".dart"],
 }
 
+
+
+DOMINATES = {
+    "C++": ["C"],
+    "TypeScript": ["JavaScript"],
+}
+
+
+def get_language_counts(repo_urls):
+    counts = defaultdict(int)
+    for url in repo_urls:
+        name = url.split("/")[-1].replace(".git", "")
+        if os.path.exists(name):
+            shutil.rmtree(name)
+        subprocess.run(["git", "clone", "--depth", "1", url], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        if not os.path.exists(name):
+            continue
+
+        used_langs = set()
+        for root, _, files in os.walk(name):
+            for file in files:
+                ext = os.path.splitext(file)[1].lower()
+                for lang, exts in LANGUAGES_EXT.items():
+                    if ext in exts:
+                        used_langs.add(lang)
+                        break
+
+        
+        for dominant, dominated in DOMINATES.items():
+            if dominant in used_langs:
+                for weak in dominated:
+                    used_langs.discard(weak)
+
+        for lang in used_langs:
+            counts[lang] += 1
+
+        shutil.rmtree(name)
+    return counts
+
+
 def get_user_repos():
     repos = []
     page = 1
@@ -70,6 +110,7 @@ def get_language_counts(repo_urls):
             counts[lang] += 1
         shutil.rmtree(name)
     return counts
+
 
 def update_readme(counts):
     start_tag = "<!--LANGUAGE_STATS_START-->"
