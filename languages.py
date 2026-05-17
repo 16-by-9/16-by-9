@@ -9,8 +9,8 @@ TOKEN = os.getenv("GITHUB_TOKEN")  # must be set in GitHub Actions secrets
 
 LANGUAGES_EXT = {
     "Python": [".py", ".pyi", ".pyl"],
-    "C++": [".cpp", ".cxx", ".cc", ".hpp", ".ino"],
-    "C": [".c", ".h"],
+    "C++": [".cpp", ".cxx", ".cc", ".h", ".hpp", ".ino"],
+    "C": [".c"],
     "C#": [".cs"],
     "Java": [".java", ".jar"],
     "JavaScript": [".js"],
