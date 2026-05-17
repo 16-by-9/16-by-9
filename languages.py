@@ -23,7 +23,7 @@ LANGUAGES_EXT = {
     "Assembly": [".s", ".asm"],
     "PHP": [".php"],
     "Kotlin": [".kt", ".kts"],
-    "SolidWorks": [".3MF"],
+    "SolidWorks": [".sldprt"],
     "Swift": [".swift"],
     "Ruby": [".rb"],
     "R": [".r"],
