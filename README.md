@@ -45,7 +45,7 @@
 <!--LANGUAGE_STATS_START-->
 - 18 C++ projects
 - 14 Python projects
-- 2 C projects
+- 1 SolidWorks project
 <!--LANGUAGE_STATS_END-->
 
 ---
