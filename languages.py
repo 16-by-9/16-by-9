@@ -17,7 +17,6 @@ LANGUAGES_EXT = {
     "TypeScript": [".ts"],
     "Go": [".go"],
     "Rust": [".rs"],
-    "CMake": [".cmake", ".make"],
     "Shell": [".sh"],
     "HTML": [".html", ".htm"],
     "CSS": [".css"],
