@@ -7,6 +7,10 @@ from collections import defaultdict
 
 USERNAME = "16-by-9"
 
+EXCLUDED_REPOS = {
+    "16-by-9",
+}
+
 LANGUAGES_EXT = {
     "Python": [".py", ".pyi", ".pyl"],
     "C++": [".cpp", ".cxx", ".cc", ".h", ".hpp", ".ino"],
@@ -30,7 +34,6 @@ LANGUAGES_EXT = {
     "Dart": [".dart"],
 }
 
-
 DOMINATES = {
     "C++": ["C"],
     "TypeScript": ["JavaScript"],
@@ -43,9 +46,10 @@ SECONDARY_THRESHOLD = 0.40
 SIZE_WEIGHT = 0.70
 FILE_WEIGHT = 0.30
 
-
+# Prevents giant files from overpowering everything
 USE_LOG_SIZE = True
 
+# Ignore directories that would distort actual language
 SKIP_DIRS = {
     ".git",
     "node_modules",
@@ -68,7 +72,10 @@ def get_user_repos():
     page = 1
 
     while True:
-        url = f"https://api.github.com/users/{USERNAME}/repos?per_page=100&page={page}"
+        url = (
+            f"https://api.github.com/users/"
+            f"{USERNAME}/repos?per_page=100&page={page}"
+        )
 
         r = requests.get(
             url,
@@ -80,7 +87,10 @@ def get_user_repos():
         )
 
         if r.status_code != 200:
-            raise Exception(f"GitHub API error: {r.status_code} - {r.text}")
+            raise Exception(
+                f"GitHub API error: "
+                f"{r.status_code} - {r.text}"
+            )
 
         data = r.json()
 
@@ -90,8 +100,15 @@ def get_user_repos():
         repos.extend(data)
         page += 1
 
-    # Public repos only
-    return [repo["clone_url"] for repo in repos if not repo["fork"]]
+    # Public repos only.
+    # Ignore forks.
+    # Ignore excluded repos.
+    return [
+        repo["clone_url"]
+        for repo in repos
+        if not repo["fork"]
+        and repo["name"] not in EXCLUDED_REPOS
+    ]
 
 
 def scan_repo_language_scores(repo_path):
@@ -99,19 +116,23 @@ def scan_repo_language_scores(repo_path):
     size_scores = defaultdict(float)
 
     for root, dirs, files in os.walk(repo_path):
-        dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
+        # Skip junk/generated dirs.
+        dirs[:] = [
+            d for d in dirs
+            if d not in SKIP_DIRS
+        ]
 
         for file in files:
             ext = os.path.splitext(file)[1].lower()
 
-            lang = None
+            matched_lang = None
 
-            for candidate_lang, exts in LANGUAGES_EXT.items():
+            for lang, exts in LANGUAGES_EXT.items():
                 if ext in exts:
-                    lang = candidate_lang
+                    matched_lang = lang
                     break
 
-            if not lang:
+            if not matched_lang:
                 continue
 
             path = os.path.join(root, file)
@@ -121,14 +142,13 @@ def scan_repo_language_scores(repo_path):
             except OSError:
                 raw_size = 0
 
-            # Logarithmic scaling
             if USE_LOG_SIZE:
                 weighted_size = math.log2(raw_size + 1)
             else:
                 weighted_size = raw_size
 
-            file_counts[lang] += 1
-            size_scores[lang] += weighted_size
+            file_counts[matched_lang] += 1
+            size_scores[matched_lang] += weighted_size
 
     total_files = sum(file_counts.values())
     total_size = sum(size_scores.values())
@@ -155,11 +175,11 @@ def scan_repo_language_scores(repo_path):
 def apply_dominance(lang_scores):
     used_langs = set(lang_scores.keys())
 
-    for dominant, dominated_list in DOMINATES.items():
+    for dominant, dominated_langs in DOMINATES.items():
         if dominant not in lang_scores:
             continue
 
-        for weak in dominated_list:
+        for weak in dominated_langs:
             if weak not in lang_scores:
                 continue
 
@@ -173,10 +193,12 @@ def apply_dominance(lang_scores):
 
             weak_ratio = weak_score / pair_total
 
-            
+            # Weak language is only helper noise.
             if weak_ratio < SECONDARY_THRESHOLD:
                 used_langs.discard(weak)
 
+            # If both are substantial,
+            # keep whichever is more dominant.
             elif dominant_score >= weak_score:
                 used_langs.discard(weak)
 
@@ -190,10 +212,13 @@ def get_language_counts(repo_urls):
     counts = defaultdict(int)
 
     for url in repo_urls:
-        name = url.split("/")[-1].replace(".git", "")
+        repo_name = (
+            url.split("/")[-1]
+            .replace(".git", "")
+        )
 
-        if os.path.exists(name):
-            shutil.rmtree(name)
+        if os.path.exists(repo_name):
+            shutil.rmtree(repo_name)
 
         subprocess.run(
             ["git", "clone", "--depth", "1", url],
@@ -201,11 +226,11 @@ def get_language_counts(repo_urls):
             stderr=subprocess.DEVNULL,
         )
 
-        if not os.path.exists(name):
+        if not os.path.exists(repo_name):
             continue
 
         try:
-            lang_scores = scan_repo_language_scores(name)
+            lang_scores = scan_repo_language_scores(repo_name)
 
             if not lang_scores:
                 continue
@@ -216,7 +241,7 @@ def get_language_counts(repo_urls):
                 counts[lang] += 1
 
         finally:
-            shutil.rmtree(name)
+            shutil.rmtree(repo_name)
 
     return counts
 
@@ -228,12 +253,18 @@ def update_readme(counts):
     with open("README.md", "r", encoding="utf-8") as f:
         content = f.read()
 
+    if start_tag not in content or end_tag not in content:
+        raise Exception(
+            "README.md is missing language stats tags."
+        )
+
     before = content.split(start_tag)[0]
     after = content.split(end_tag)[1]
 
     stats = "\n".join(
         [
-            f"- {count} {lang} project{'s' if count != 1 else ''}"
+            f"- {count} {lang} project"
+            f"{'s' if count != 1 else ''}"
             for lang, count in sorted(
                 counts.items(),
                 key=lambda x: (-x[1], x[0])
@@ -241,7 +272,11 @@ def update_readme(counts):
         ]
     )
 
-    new_block = f"{start_tag}\n{stats}\n{end_tag}"
+    new_block = (
+        f"{start_tag}\n"
+        f"{stats}\n"
+        f"{end_tag}"
+    )
 
     with open("README.md", "w", encoding="utf-8") as f:
         f.write(before + new_block + after)
