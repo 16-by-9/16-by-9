@@ -1,11 +1,11 @@
+import math
 import os
 import requests
-import subprocess
 import shutil
+import subprocess
 from collections import defaultdict
 
 USERNAME = "16-by-9"
-TOKEN = os.getenv("GITHUB_TOKEN")
 
 LANGUAGES_EXT = {
     "Python": [".py", ".pyi", ".pyl"],
@@ -30,83 +30,219 @@ LANGUAGES_EXT = {
     "Dart": [".dart"],
 }
 
+
 DOMINATES = {
     "C++": ["C"],
     "TypeScript": ["JavaScript"],
 }
 
-SECONDARY_THRESHOLD = 0.4
+
+SECONDARY_THRESHOLD = 0.40
+
+# Hybrid weighting
+SIZE_WEIGHT = 0.70
+FILE_WEIGHT = 0.30
+
+
+USE_LOG_SIZE = True
+
+SKIP_DIRS = {
+    ".git",
+    "node_modules",
+    "build",
+    "dist",
+    ".dart_tool",
+    "__pycache__",
+    ".idea",
+    ".vscode",
+    ".vs",
+    "target",
+    "out",
+    "bin",
+    "obj",
+}
 
 
 def get_user_repos():
     repos = []
     page = 1
+
     while True:
         url = f"https://api.github.com/users/{USERNAME}/repos?per_page=100&page={page}"
-        headers = {"Authorization": f"token {TOKEN}"}
-        r = requests.get(url, headers=headers)
+
+        r = requests.get(
+            url,
+            headers={
+                "Accept": "application/vnd.github+json",
+                "X-GitHub-Api-Version": "2022-11-28",
+            },
+            timeout=30,
+        )
+
         if r.status_code != 200:
             raise Exception(f"GitHub API error: {r.status_code} - {r.text}")
+
         data = r.json()
+
         if not data:
             break
-        repos += data
+
+        repos.extend(data)
         page += 1
-    return [repo["clone_url"] for repo in repos]
+
+    # Public repos only
+    return [repo["clone_url"] for repo in repos if not repo["fork"]]
+
+
+def scan_repo_language_scores(repo_path):
+    file_counts = defaultdict(int)
+    size_scores = defaultdict(float)
+
+    for root, dirs, files in os.walk(repo_path):
+        dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
+
+        for file in files:
+            ext = os.path.splitext(file)[1].lower()
+
+            lang = None
+
+            for candidate_lang, exts in LANGUAGES_EXT.items():
+                if ext in exts:
+                    lang = candidate_lang
+                    break
+
+            if not lang:
+                continue
+
+            path = os.path.join(root, file)
+
+            try:
+                raw_size = os.path.getsize(path)
+            except OSError:
+                raw_size = 0
+
+            # Logarithmic scaling
+            if USE_LOG_SIZE:
+                weighted_size = math.log2(raw_size + 1)
+            else:
+                weighted_size = raw_size
+
+            file_counts[lang] += 1
+            size_scores[lang] += weighted_size
+
+    total_files = sum(file_counts.values())
+    total_size = sum(size_scores.values())
+
+    if total_files == 0 or total_size == 0:
+        return {}
+
+    lang_scores = {}
+
+    for lang in set(file_counts) | set(size_scores):
+        file_ratio = file_counts[lang] / total_files
+        size_ratio = size_scores[lang] / total_size
+
+        score = (
+            FILE_WEIGHT * file_ratio
+            + SIZE_WEIGHT * size_ratio
+        )
+
+        lang_scores[lang] = score
+
+    return lang_scores
+
+
+def apply_dominance(lang_scores):
+    used_langs = set(lang_scores.keys())
+
+    for dominant, dominated_list in DOMINATES.items():
+        if dominant not in lang_scores:
+            continue
+
+        for weak in dominated_list:
+            if weak not in lang_scores:
+                continue
+
+            dominant_score = lang_scores[dominant]
+            weak_score = lang_scores[weak]
+
+            pair_total = dominant_score + weak_score
+
+            if pair_total <= 0:
+                continue
+
+            weak_ratio = weak_score / pair_total
+
+            
+            if weak_ratio < SECONDARY_THRESHOLD:
+                used_langs.discard(weak)
+
+            elif dominant_score >= weak_score:
+                used_langs.discard(weak)
+
+            else:
+                used_langs.discard(dominant)
+
+    return used_langs
 
 
 def get_language_counts(repo_urls):
     counts = defaultdict(int)
+
     for url in repo_urls:
         name = url.split("/")[-1].replace(".git", "")
+
         if os.path.exists(name):
             shutil.rmtree(name)
-        subprocess.run(["git", "clone", "--depth", "1", url], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+        subprocess.run(
+            ["git", "clone", "--depth", "1", url],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+
         if not os.path.exists(name):
             continue
 
-        file_counts = defaultdict(int)
-        for root, _, files in os.walk(name):
-            for file in files:
-                ext = os.path.splitext(file)[1].lower()
-                for lang, exts in LANGUAGES_EXT.items():
-                    if ext in exts:
-                        file_counts[lang] += 1
-                        break
+        try:
+            lang_scores = scan_repo_language_scores(name)
 
-        used_langs = set(file_counts.keys())
+            if not lang_scores:
+                continue
 
-        for dominant, dominated in DOMINATES.items():
-            if dominant in file_counts:
-                for weak in dominated:
-                    if weak in file_counts:
-                        total = file_counts[dominant] + file_counts[weak]
-                        weak_ratio = file_counts[weak] / total
-                        if weak_ratio < SECONDARY_THRESHOLD:
-                            used_langs.discard(weak)
-                        elif file_counts[dominant] >= file_counts[weak]:
-                            used_langs.discard(weak)
-                        else:
-                            used_langs.discard(dominant)
+            used_langs = apply_dominance(lang_scores)
 
-        for lang in used_langs:
-            counts[lang] += 1
+            for lang in used_langs:
+                counts[lang] += 1
 
-        shutil.rmtree(name)
+        finally:
+            shutil.rmtree(name)
+
     return counts
 
 
 def update_readme(counts):
     start_tag = "<!--LANGUAGE_STATS_START-->"
     end_tag = "<!--LANGUAGE_STATS_END-->"
+
     with open("README.md", "r", encoding="utf-8") as f:
         content = f.read()
+
     before = content.split(start_tag)[0]
     after = content.split(end_tag)[1]
+
     stats = "\n".join(
-        [f"- {count} {lang} project{'s' if count > 1 else ''}" for lang, count in sorted(counts.items(), key=lambda x: -x[1])]
+        [
+            f"- {count} {lang} project{'s' if count != 1 else ''}"
+            for lang, count in sorted(
+                counts.items(),
+                key=lambda x: (-x[1], x[0])
+            )
+        ]
     )
+
     new_block = f"{start_tag}\n{stats}\n{end_tag}"
+
     with open("README.md", "w", encoding="utf-8") as f:
         f.write(before + new_block + after)
 
