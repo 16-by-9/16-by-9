@@ -35,7 +35,7 @@ DOMINATES = {
     "TypeScript": ["JavaScript"],
 }
 
-SECONDARY_THRESHOLD = 0.4  # secondary lang needs 40%+ share to not be dropped
+SECONDARY_THRESHOLD = 0.4
 
 
 def get_user_repos():
@@ -83,13 +83,10 @@ def get_language_counts(repo_urls):
                         total = file_counts[dominant] + file_counts[weak]
                         weak_ratio = file_counts[weak] / total
                         if weak_ratio < SECONDARY_THRESHOLD:
-                            # secondary is incidental, drop it
                             used_langs.discard(weak)
                         elif file_counts[dominant] >= file_counts[weak]:
-                            # mixed but dominant leads or ties, keep dominant
                             used_langs.discard(weak)
                         else:
-                            # weak genuinely leads, drop dominant instead
                             used_langs.discard(dominant)
 
         for lang in used_langs:
